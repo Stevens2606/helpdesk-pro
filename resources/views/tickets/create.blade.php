@@ -46,4 +46,9 @@
             <button class="px-4 py-2 bg-gray-800 text-white rounded-md">Kirim</button>
         </form>
     </div>
+    <div>
+    <label class="block text-sm font-medium">Lampiran (maks. 3 file, 5 MB)</label>
+    <input type="file" name="attachments[]" multiple class="mt-1 w-full text-sm">
+    @error('attachments.*') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+</div>
 </x-app-layout>

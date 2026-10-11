@@ -51,4 +51,52 @@
             </form>
         @endcan
     </div>
+    @if ($ticket->attachments->isNotEmpty())
+    <ul class="mt-4 text-sm list-disc ml-5">
+        @foreach ($ticket->attachments as $file)
+            <li>
+                <a class="text-blue-600" target="_blank"
+                   href="{{ asset('storage/' . $file->path) }}">{{ $file->original_name }}</a>
+                ({{ number_format($file->size / 1024, 0) }} KB)
+            </li>
+        @endforeach
+    </ul>
+@endif<div class="bg-white shadow rounded p-6 space-y-4">
+    <h4 class="font-semibold">Komentar</h4>
+
+    @forelse ($ticket->comments as $comment)
+        <div class="border rounded p-3 {{ $comment->is_internal ? 'bg-yellow-50 border-yellow-300' : '' }}">
+            <div class="text-xs text-gray-500 mb-1">
+                {{ $comment->user->name }} · {{ $comment->created_at->diffForHumans() }}
+                @if ($comment->is_internal) · <b>Catatan internal</b> @endif
+            </div>
+            <p class="whitespace-pre-line">{{ $comment->body }}</p>
+            @foreach ($comment->attachments as $file)
+                <a class="block text-sm text-blue-600" target="_blank"
+                   href="{{ asset('storage/' . $file->path) }}">{{ $file->original_name }}</a>
+            @endforeach
+        </div>
+    @empty
+        <p class="text-sm text-gray-500">Belum ada komentar.</p>
+    @endforelse
+
+    <form method="POST" action="{{ route('tickets.comments.store', $ticket) }}"
+          enctype="multipart/form-data" class="space-y-3">
+        @csrf
+        <textarea name="body" rows="3" class="w-full border-gray-300 rounded-md"
+                  placeholder="Tulis komentar...">{{ old('body') }}</textarea>
+        @error('body') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+
+        <input type="file" name="attachments[]" multiple class="text-sm">
+        @error('attachments.*') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+
+        @if (auth()->user()->role !== 'customer')
+            <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="is_internal" value="1"> Catatan internal (tidak terlihat pelanggan)
+            </label>
+        @endif
+
+        <button class="px-4 py-2 bg-gray-800 text-white rounded-md">Kirim Komentar</button>
+    </form>
+</div>
 </x-app-layout>
