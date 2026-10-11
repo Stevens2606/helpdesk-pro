@@ -22,7 +22,17 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function assignedTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'assigned_to');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
