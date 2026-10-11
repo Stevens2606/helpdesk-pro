@@ -12,18 +12,15 @@ class UpdateTicketRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true; // otorisasi ditangani TicketPolicy di controller
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'status'      => ['required', 'in:open,in_progress,resolved,closed'],
+            'priority'    => ['required', 'in:low,medium,high,urgent'],
+            'assigned_to' => ['nullable', 'exists:users,id'],
         ];
     }
 }
