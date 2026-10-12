@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TicketStatus;
+use App\Observers\TicketObserver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy(TicketObserver::class)]
 class Ticket extends Model
 {
     use HasFactory, SoftDeletes;

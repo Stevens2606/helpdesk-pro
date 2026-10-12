@@ -99,4 +99,21 @@
         <button class="px-4 py-2 bg-gray-800 text-white rounded-md">Kirim Komentar</button>
     </form>
 </div>
+@if (auth()->user()->role !== 'customer')
+    <div class="bg-white shadow rounded p-6">
+        <h4 class="font-semibold mb-3">Riwayat Aktivitas</h4>
+        <ul class="text-sm space-y-2">
+            @foreach ($ticket->logs->sortByDesc('created_at') as $log)
+                <li class="border-b pb-2">
+                    <span class="text-gray-500">{{ $log->created_at->format('d M Y H:i') }}</span>
+                    · <b>{{ $log->user?->name ?? 'Sistem' }}</b>
+                    · {{ str_replace('_', ' ', $log->action) }}
+                    @if ($log->old_value || $log->new_value)
+                        : {{ $log->old_value ?? '-' }} → {{ $log->new_value ?? '-' }}
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 </x-app-layout>

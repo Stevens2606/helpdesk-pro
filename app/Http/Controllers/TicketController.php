@@ -7,7 +7,10 @@ use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Category;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Notifications\TicketCreatedNotification;
+use App\Services\AttachmentService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 
 class TicketController extends Controller
 {
@@ -32,13 +35,22 @@ class TicketController extends Controller
         ]);
     }
 
-    public function store(StoreTicketRequest $request)
+    public function store(StoreTicketRequest $request, AttachmentService $attachments)
     {
         Gate::authorize('create', Ticket::class);
 
-        $ticket = Ticket::create($request->validated() + [
-            'user_id' => auth()->id(),
-        ]);
+        $ticket = Ticket::create(
+            $request->safe()->except('attachments') + ['user_id' => auth()->id()]
+        );
+
+        $attachments->store($ticket, $request->file('attachments', []));
+
+        // kirim ke staf/admin, kecuali pembuat tiketnya sendiri
+        $staff = User::whereIn('role', ['admin', 'staff'])
+            ->where('id', '!=', auth()->id())
+            ->get();
+
+        Notification::send($staff, new TicketCreatedNotification($ticket));
 
         return redirect()->route('tickets.show', $ticket)
             ->with('status', 'Tiket berhasil dibuat.');
@@ -48,7 +60,15 @@ class TicketController extends Controller
     {
         Gate::authorize('view', $ticket);
 
-        $ticket->load(['customer', 'assignee', 'category']);
+        $isCustomer = auth()->user()->role === 'customer';
+
+        $ticket->load([
+            'customer', 'assignee', 'category', 'attachments', 'logs.user:id,name',
+            'comments' => fn ($q) => $q
+                ->when($isCustomer, fn ($q) => $q->where('is_internal', false))
+                ->with(['user:id,name', 'attachments'])
+                ->oldest(),
+        ]);
 
         return view('tickets.show', [
             'ticket' => $ticket,
@@ -62,8 +82,13 @@ class TicketController extends Controller
 
         $data = $request->validated();
 
-        if (in_array($data['status'], ['resolved', 'closed']) && ! $ticket->resolved_at) {
+        $isDone = in_array($data['status'], ['resolved', 'closed']);
+
+        if ($isDone && ! $ticket->resolved_at) {
             $data['resolved_at'] = now();
+        } elseif (! $isDone) {
+            // tiket dibuka kembali, hapus waktu selesai
+            $data['resolved_at'] = null;
         }
 
         $ticket->update($data);

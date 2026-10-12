@@ -6,7 +6,7 @@ use App\Http\Requests\StoreCommentRequest;
 use App\Models\Ticket;
 use App\Services\AttachmentService;
 use Illuminate\Support\Facades\Gate;
-
+use App\Notifications\TicketRepliedNotification;
 class TicketCommentController extends Controller
 {
     public function store(StoreCommentRequest $request, Ticket $ticket, AttachmentService $attachments)
