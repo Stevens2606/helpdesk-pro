@@ -41,6 +41,10 @@
                     @empty
                         <tr><td colspan="7" class="p-6 text-center text-gray-500">Belum ada tiket.</td></tr>
                     @endforelse
+
+                    @if ($ticket->sla_breached_at)
+                    <span class="ml-1 px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded">SLA lewat</span>
+@endif
                 </tbody>
             </table>
         </div>

@@ -96,6 +96,10 @@
             </label>
         @endif
 
+        @if ($ticket->sla_breached_at)
+    <span class="ml-1 px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded">SLA lewat</span>
+        @endif
+
         <button class="px-4 py-2 bg-gray-800 text-white rounded-md">Kirim Komentar</button>
     </form>
 </div>

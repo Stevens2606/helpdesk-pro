@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schedule;
 
 Route::view('/', 'welcome');
 
@@ -21,3 +22,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('tickets/{ticket}/comments', [TicketCommentController::class, 'store'])
         ->name('tickets.comments.store');
 });
+
+Schedule::command('tickets:check-overdue')->hourly()->withoutOverlapping();

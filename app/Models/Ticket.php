@@ -36,6 +36,7 @@ class Ticket extends Model
         'status'      => TicketStatus::class,
         'due_at'      => 'datetime',
         'resolved_at' => 'datetime',
+        'sla_breached_at' => 'datetime',
     ];
 
     public function customer(): BelongsTo
