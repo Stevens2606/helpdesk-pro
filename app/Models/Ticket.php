@@ -38,6 +38,10 @@ class Ticket extends Model
         'resolved_at' => 'datetime',
         'sla_breached_at' => 'datetime',
     ];
+       protected $attributes = [
+        'status'   => 'open',
+        'priority' => 'medium',
+    ];
 
     public function customer(): BelongsTo
     {
@@ -75,6 +79,7 @@ class Ticket extends Model
                 TicketStatus::Resolved->value,
                 TicketStatus::Closed->value,
             ])
+            
             ->where('due_at', '<', now());
     }
 

@@ -15,10 +15,15 @@ class TicketFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
+   public function definition(): array
     {
         return [
-            //
+            'user_id'     => \App\Models\User::factory(),
+            'category_id' => \App\Models\Category::factory(),
+            'subject'     => fake()->sentence(4),
+            'description' => fake()->paragraph(),
+            'priority'    => 'medium',
+            'status'      => 'open',
         ];
     }
 }
