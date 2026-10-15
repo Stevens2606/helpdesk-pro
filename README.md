@@ -1,59 +1,81 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HelpDesk Pro
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Tests](https://github.com/Stevens2606/helpdesk-pro/actions/workflows/tests.yml/badge.svg)
 
-## About Laravel
+Sistem tiket dukungan (helpdesk) dengan tiga peran (pelanggan, staf, admin), SLA otomatis, notifikasi email via queue, dan REST API.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<!-- Tambahkan 2-3 screenshot di sini setelah aplikasi berjalan -->
+<!-- ![Daftar tiket](docs/screenshots/tickets.png) -->
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Alur tiket lengkap: open → in progress → resolved → closed
+- Role-based access control dengan Policy (pelanggan hanya melihat tiketnya sendiri)
+- Komentar tiket, catatan internal (tidak terlihat pelanggan), dan lampiran file
+- Riwayat aktivitas otomatis lewat Observer
+- Notifikasi email via queue (database queue)
+- Scheduler per jam yang menandai tiket melewati batas SLA
+- REST API versi 1 dengan Laravel Sanctum, rate limiting, dan dokumentasi Scribe
+- 39 tes otomatis (Pest) dengan CI di GitHub Actions
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Laravel 12, PHP 8.2, MySQL, Livewire (Breeze), Tailwind CSS, Laravel Sanctum, Pest
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Cara Menjalankan
 
-## Laravel Sponsors
+```bash
+git clone https://github.com/Stevens2606/helpdesk-pro.git
+cd helpdesk-pro
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Buat database `helpdesk_pro`, atur kredensial di `.env`, lalu:
 
-### Premium Partners
+```bash
+php artisan migrate --seed
+php artisan storage:link
+npm install && npm run build
+php artisan serve
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Jalankan worker queue di terminal lain:
 
-## Contributing
+```bash
+php artisan queue:work
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Akun Demo (hanya untuk pengembangan)
 
-## Code of Conduct
+| Peran | Email | Password |
+|---|---|---|
+| Admin | admin@example.com | password |
+| Staff | staff@example.com | password |
+| Customer | customer@example.com | password |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Testing
 
-## Security Vulnerabilities
+```bash
+php artisan test
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## API
 
-## License
+Dokumentasi interaktif tersedia di `/docs` setelah menjalankan `php artisan scribe:generate`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Alur singkat: `POST /api/v1/login` untuk mendapat token, lalu kirim header `Authorization: Bearer <token>` ke `/api/v1/tickets`.
+
+## Keputusan Teknis
+
+- **Policy** untuk otorisasi, sehingga aturan akses terpusat dan mudah diuji
+- **Observer** untuk mencatat riwayat aktivitas tanpa mengotori controller
+- **Eager loading** di seluruh daftar untuk mencegah N+1 query
+- **Catatan internal disaring di query**, bukan di tampilan, sehingga data tidak pernah sampai ke pelanggan
+- **Scheduler idempotent**: kolom `sla_breached_at` memastikan tiap tiket hanya diproses sekali
+- **Tes menemukan bug nyata** (default status tiket), yang kemudian diperbaiki
+
+## Lisensi
+
+MIT
