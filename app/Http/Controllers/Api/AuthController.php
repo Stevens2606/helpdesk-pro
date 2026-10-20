@@ -8,8 +8,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @group Autentikasi
+ */
 class AuthController extends Controller
 {
+    /**
+     * Login
+     *
+     * Menukar email dan password dengan token API.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam email string required Email pengguna. Example: customer@example.com
+     * @bodyParam password string required Password. Example: password
+     *
+     * @response 200 {
+     *   "token": "1|abcdef123456...",
+     *   "user": {"id": 3, "name": "Customer", "role": "customer"}
+     * }
+     * @response 422 {
+     *   "message": "Email atau password salah.",
+     *   "errors": {"email": ["Email atau password salah."]}
+     * }
+     */
     public function login(Request $request)
     {
         $data = $request->validate([
@@ -31,6 +53,15 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Logout
+     *
+     * Mencabut token yang sedang dipakai.
+     *
+     * @authenticated
+     *
+     * @response 200 {"message": "Logout berhasil."}
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

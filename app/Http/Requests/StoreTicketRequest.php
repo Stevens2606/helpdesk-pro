@@ -15,15 +15,13 @@ class StoreTicketRequest extends FormRequest
         return true;
     }
 
-    public function rules(): array
-    {
-        return [
-            'subject'     => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'priority'    => ['required', 'in:low,medium,high,urgent'],
-            'attachments'   => ['nullable', 'array', 'max:3'],
-            'attachments.*' => ['file', 'max:5120', 'mimes:jpg,jpeg,png,pdf,doc,docx,xlsx,txt'],
-        ];
-    }
+ public function bodyParameters(): array
+{
+    return [
+        'subject'     => ['description' => 'Judul singkat tiket.', 'example' => 'Printer tidak bisa mencetak'],
+        'description' => ['description' => 'Penjelasan masalah.', 'example' => 'Printer lantai 2 error.'],
+        'category_id' => ['description' => 'ID kategori.', 'example' => 1],
+        'priority'    => ['description' => 'low, medium, high, atau urgent.', 'example' => 'high'],
+    ];
+}
 }
