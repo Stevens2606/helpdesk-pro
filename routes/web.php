@@ -24,3 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Schedule::command('tickets:check-overdue')->hourly()->withoutOverlapping();
+
+use App\Http\Controllers\ReportController;
+
+Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
