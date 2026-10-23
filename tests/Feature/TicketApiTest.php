@@ -22,6 +22,8 @@ it('only lists a customer own tickets', function () {
 });
 
 it('creates a ticket through the API', function () {
+    $this->withoutExceptionHandling();
+
     Sanctum::actingAs(User::factory()->create(['role' => 'customer']));
     $category = Category::factory()->create();
 
