@@ -1,7 +1,9 @@
 FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libsqlite3-dev libpng-dev libonig-dev nodejs npm \
+    git unzip curl ca-certificates libzip-dev libsqlite3-dev libpng-dev libonig-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
     && docker-php-ext-install pdo_sqlite zip gd mbstring \
     && rm -rf /var/lib/apt/lists/*
 
@@ -10,7 +12,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
+RUN composer install --optimize-autoloader --no-interaction \
     && npm ci && npm run build
 
 RUN touch database/database.sqlite \
