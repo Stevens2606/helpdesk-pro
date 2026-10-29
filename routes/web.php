@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schedule;
 
 Route::view('/', 'welcome');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', \App\Http\Controllers\DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -29,3 +29,4 @@ use App\Http\Controllers\ReportController;
 
 Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
+
