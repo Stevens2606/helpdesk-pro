@@ -22,19 +22,27 @@ new class extends Component
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+<div class="shrink-0 flex items-center">
+    <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2">
+        <x-application-logo class="block h-8 w-auto fill-current text-indigo-600" />
+        <span class="font-bold text-gray-800 tracking-tight">HelpDesk <span class="text-indigo-600">Pro</span></span>
+    </a>
+</div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div>
-            </div>
+<div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
+        {{ __('Dashboard') }}
+    </x-nav-link>
+    <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')" wire:navigate>
+        Tiket
+    </x-nav-link>
+    @if (auth()->user()->role === 'admin')
+        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>
+            Laporan
+        </x-nav-link>
+    @endif
+</div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
